@@ -1,1 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Registration Form</title>
+<style>
+  body {
+    text-align: center;
+  }
+
+  form {
+    width: 300px; /* Set the width of the form */
+    margin: auto; /* Center the form horizontally */
+    text-align: left; /* Align text to the left within the form */
+  }
+
+  .container {
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 10px; /* Add space between each container */
+  }
+
+  .container label,
+  .container input,
+  .container select,
+  .container textarea {
+    display: inline-block; /* Display elements in the same line */
+    margin-bottom: 20px; /* Add space between each detail */
+  }
+
+  .container input[type="radio"] {
+    display: inline; /* Display radio buttons in the same line */
+    margin-right: 5px; /* Add space between radio buttons and labels */
+  }
+
+  .container button {
+    width: 100%; /* Set the width of the button to 100% */
+  }
+
+  .submit-button {
+    text-align: center; /* Align the submit button to the center */
+  }
+
+  .error-message {
+    color: red; /* Set color of error messages to red */
+    font-size: 0.8em; /* Adjust font size of error messages */
+    display: inline-block; /* Display error messages in the same line */
+  }
+
+</style>
+</head>
+<body>
+
+<h2>Registration Form</h2>
+
+<form action="/action_page.php" method="post" onsubmit="return validateForm()">
+
+  <div class="container">
+    <label for="userid">User ID:</label>
+    <input type="text" placeholder="Enter User ID" name="userid" id="userid" required>
+    <span class="error-message" id="userid-error"></span><br>
+
+    <label for="psw">Password:</label>
+    <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+    <span class="error-message" id="psw-error"></span><br>
+
+    <label for="name">Name:</label>
+    <input type="text" placeholder="Enter Name" name="name" id="name" required>
+    <span class="error-message" id="name-error"></span><br>
+
+    <label for="address">Address:</label>
+    <input type="text" placeholder="Enter Address" name="address" id="address"><br>
+
+    <label for="country">Country:</label>
+    <select id="country" name="country" required>
+      <option value="">Please select a country</option>
+      <option value="India">USA</option>
+      <option value="Canada">Canada</option>
+      <option value="UK">UK</option>
+      <option value="Australia">India</option>
+    </select>
+    <span class="error-message" id="country-error"></span><br>
+
+    <label for="zip">ZIP Code:</label>
+    <input type="text" placeholder="Enter ZIP Code" name="zip" id="zip" required>
+    <span class="error-message" id="zip-error"></span><br>
+
+    <label for="email">Email:</label>
+    <input type="text" placeholder="Enter Email" name="email" id="email" required>
+    <span class="error-message" id="email-error"></span><br>
+    
+    <label for="sex">Sex:</label>
+    <input type="radio" name="sex" id="male" value="male">
+    <label for="male">Male</label>
+    <input type="radio" name="sex" id="female" value="female">
+    <label for="female">Female</label>
+    <input type="radio" name="sex" id="other" value="other">
+    <label for="male">Other</label>
+    <span class="error-message" id="sex-error"></span><br>
+
+    <label for="language">Language:</label>
+    <input type="radio" name="language" id="english" value="english">
+    <label for="english">English</label>
+    <input type="radio" name="language" id="nonenglish" value="nonenglish">
+    <label for="nonenglish">Non English</label>
+    <span class="error-message" id="language-error"></span><br>
+
+    <label for="about">About:</label>
+    <textarea id="about" name="about" placeholder="Write something about yourself.." style="vertical-align: top;"></textarea>
+    <span class="error-message" id="about-error"></span><br>
+
+    <div class="submit-button">
+      <button type="submit">Submit</button>
+    </div>
+  </div>
+</form>
+
+<script>
+  function validateForm() {
+    var userid = document.getElementById("userid").value;
+    var password = document.getElementById("psw").value;
+    var name = document.getElementById("name").value;
+    var country = document.getElementById("country").value;
+    var zip = document.getElementById("zip").value;
+    var email = document.getElementById("email").value;
+    var sex = document.querySelector('input[name="sex"]:checked');
+    var language = document.querySelector('input[name="language"]:checked');
+    var about = document.getElementById("about").value;
+
+    document.getElementById("userid-error").innerHTML = "";
+    document.getElementById("psw-error").innerHTML = "";
+    document.getElementById("name-error").innerHTML = "";
+    document.getElementById("country-error").innerHTML = "";
+    document.getElementById("zip-error").innerHTML = "";
+    document.getElementById("email-error").innerHTML = "";
+    document.getElementById("sex-error").innerHTML = "";
+    document.getElementById("language-error").innerHTML = "";
+    document.getElementById("about-error").innerHTML = "";
+
+    var isValid = true;
+
+    if (userid.length < 5 || userid.length > 12) {
+      document.getElementById("userid-error").innerHTML = "User ID must be between 5 and 12 characters.";
+      isValid = false;
+    }
+
+    if (password.length < 7 || password.length > 12) {
+      document.getElementById("psw-error").innerHTML = "Password must be between 7 and 12 characters.";
+      isValid = false;
+    }
+
+    if (!/^[a-zA-Z]+$/.test(name)) {
+      document.getElementById("name-error").innerHTML = "Name must contain alphabets only.";
+      isValid = false;
+    }
+
+    if (country === "") {
+      document.getElementById("country-error").innerHTML = "Please select a country.";
+      isValid = false;
+    }
+
+    if (!/^\d+$/.test(zip)) {
+      document.getElementById("zip-error").innerHTML = "ZIP Code must contain numeric characters only.";
+      isValid = false;
+    }
+
+    if (!emailIsValid(email)) {
+      document.getElementById("email-error").innerHTML = "Invalid email address.";
+      isValid = false;
+    }
+
+    if (!sex) {
+      document.getElementById("sex-error").innerHTML = "Please select your sex.";
+      isValid = false;
+    }
+
+    if (!language) {
+      document.getElementById("language-error").innerHTML = "Please select your language.";
+      isValid = false;
+    }
+
+    if (about.length > 0 && about.length < 10) {
+      document.getElementById("about-error").innerHTML = "About must be at least 10 characters long.";
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  function emailIsValid(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+</script>
+
+</body>
+</html>
 
