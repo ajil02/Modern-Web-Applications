@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inventory Management System</h1>
+    
+    <h2>Add New Item</h2>
+    <form id="addItemForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" required>
+        <button type="submit">Add Item</button>
+    </form>
+
+    <h2>Inventory Items</h2>
+    <table id="inventoryTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Inventory items will be dynamically populated here -->
+        </tbody>
+    </table>
+
+    <script>
+        function fetchInventoryItems() {
+            fetch('/items')
+                .then(response => response.json())
+                .then(items => {
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = '';
+                    items.forEach(item => {
+                        const row = `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.quantity}</td>
+                                <td>
+                                    <button onclick="updateItem('${item._id}', '${item.name}', ${item.quantity})">Update</button>
+                                    <button onclick="deleteItem('${item._id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.insertAdjacentHTML('beforeend', row);
+                    });
+                })
+                .catch(error => console.error('Error fetching items:', error));
+        }
+
+        function resetFormFields(form) {
+            form.reset();
+        }
+
+        document.getElementById('addItemForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const newItem = Object.fromEntries(formData.entries());
+
+            fetch('/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newItem)
+            })
+            .then(response => {
+                if (response.ok) {
+                    fetchInventoryItems();
+                    resetFormFields(this);
+                } else {
+                    console.error('Error adding item:', response.statusText);
+                }
+            })
+            .catch(error => console.error('Error adding item:', error));
+        });
+
+        function updateItem(id, currentName, currentQuantity) {
+            const newName = prompt('Enter new name:', currentName);
+            const newQuantity = parseInt(prompt('Enter new quantity:', currentQuantity));
+
+            if (newName && !isNaN(newQuantity)) {
+                const updatedItem = { id, name: newName, quantity: newQuantity };
+
+                fetch('/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedItem)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        fetchInventoryItems();
+                    } else {
+                        console.error('Error updating item:', response.statusText);
+                    }
+                })
+                .catch(error => console.error('Error updating item:', error));
+            }
+        }
+
+        function deleteItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                fetch('/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        fetchInventoryItems();
+                    } else {
+                        console.error('Error deleting item:', response.statusText);
+                    }
+                })
+                .catch(error => console.error('Error deleting item:', error));
+            }
+        }
+
+        fetchInventoryItems();
+    </script>
+</body>
+</html>
